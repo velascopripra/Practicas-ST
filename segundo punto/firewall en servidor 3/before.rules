@@ -1,0 +1,28 @@
+
+#Configuración del firewall de la vm cliente (192.168.50.2), para que redirija al servidor 
+#esclavo(192.168.50.4), el cual tiene las zonas transferidas del servidor maestro (192.168.50.3). 
+#(las configuraciones para las transferencias de zonas del servidor maestro y esclavo están en el repositorio del parcial 1)
+
+#
+# rules.before
+#
+# Rules that should be run before the ufw command line added rules. Custom
+# rules should be added to one of these chains:
+#   ufw-before-input
+#   ufw-before-output
+#   ufw-before-forward
+#
+
+*nat
+:PREROUTING ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+
+# Redirigir consultas DNS (UDP y TCP) al maestro
+-A PREROUTING -p udp --dport 53 -j DNAT --to-destination 192.168.50.4:53
+-A PREROUTING -p tcp --dport 53 -j DNAT --to-destination 192.168.50.4:53
+
+# Hacer NAT para que las respuestas regresen al cliente
+-A POSTROUTING -j MASQUERADE
+
+COMMIT
+ 
